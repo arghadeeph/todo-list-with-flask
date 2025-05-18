@@ -1,5 +1,5 @@
 from db import conn
-from flask import Flask, render_template, request, redirect, jsonify
+from flask import Flask, render_template, request, redirect, jsonify, flash
 
 app = Flask(__name__)
 
@@ -39,6 +39,18 @@ def doneNotDone(task_id):
     cursor.execute("UPDATE tasks set is_done = %s WHERE id = %s", (new_is_done, task_id))
     conn.commit()
     return jsonify({"status": "success"})
+
+@app.route('/contact', methods=['GET','POST'])
+def contact():
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        subject = request.form['subject']
+        message = request.form['message']
+        cursor.execute("INSERT INTO contact_us (name, email, subject, message) values (%s, %s, %s, %s)", (name, email, subject, message))
+        conn.commit()
+        return redirect('/contact')
+    return render_template('contact.html')
 
 
 if __name__ == '__main__':
