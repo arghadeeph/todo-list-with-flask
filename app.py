@@ -12,9 +12,10 @@ cursor = conn.cursor()
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'arghadeeph@gmail.com'
-app.config['MAIL_PASSWORD'] = 'oetlfgpykaignzej'  # Use app password, not Gmail password
-app.config['MAIL_DEFAULT_SENDER'] = 'arghadeeph@gmail.com'
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
+
 
 mail = Mail(app)
 
@@ -62,9 +63,12 @@ def contact():
         message = request.form['message']
         cursor.execute("INSERT INTO contact_us (name, email, subject, message) values (%s, %s, %s, %s)", (name, email, subject, message))
         conn.commit()
+        # Send email
         msg = Message(
-        subject=subject,
-        recipients=[email],  # Change this
+        subject=subject+ ' from '+ name,
+        reply_to=email,
+        sender=os.getenv('MAIL_USERNAME'),
+        recipients=[os.getenv('MAIL_DEFAULT_SENDER')],
         body=message
         )
         mail.send(msg)
