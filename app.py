@@ -1,7 +1,9 @@
 from db import conn
 from flask import Flask, render_template, request, redirect, jsonify, flash
+import os
 
 app = Flask(__name__)
+app.secret_key = os.environ.get('FLASK_SECRET_KEY')
 
 cursor = conn.cursor()
 
